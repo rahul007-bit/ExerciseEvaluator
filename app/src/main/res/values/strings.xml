@@ -1,0 +1,27 @@
+<resources>
+    <string name="app_name">ExerciseEvaluator</string>
+    <string name="title_activity_login">LoginActivity</string>
+    <string name="prompt_email">Email</string>
+    <string name="prompt_password">Password</string>
+    <string name="action_sign_in">Sign in or register</string>
+    <string name="action_sign_in_short">Sign in</string>
+    <string name="welcome">"Welcome !"</string>
+    <string name="invalid_username">Not a valid username</string>
+    <string name="invalid_password">Password must be >5 characters</string>
+    <string name="login_failed">"Login failed"</string>
+    <string name="this_backgroud_image_of_welcome_screen">This backgroud image of welcome screen</string>
+    <string name="quotes">"Fitness is not about being better than someone else, it\'s about being better than you used to be.\" - Unknown</string>
+    <string name="bold_quotes">Get Feedback on Your Workouts</string>
+    <string name="continue_with_google">Continue with Google</string>
+    <string name="give_a_try">Give a try</string>
+    <string name="title_activity_camera_mode">cameraMode</string>
+    <string name="dummy_button">Dummy Button</string>
+    <string name="dummy_content">DUMMY\nCONTENT</string>
+    <string name="pref_key_live_preview_pose_detection_performance_mode">lppdpm</string>
+    <string name="pref_key_pose_detector_prefer_gpu">pdpg</string>
+    <string name="pref_key_still_image_pose_detection_performance_mode">sipdpm</string>
+    <string name="pref_key_camera_live_viewport">clv</string>
+    <string name="exercise_evaluator">Exercise Evaluator</string>
+    <string name="push_up_image_description">push_up_image</string>
+    <string name="let_s_get_started">Let\'s get started!!</string>
+</resources>
