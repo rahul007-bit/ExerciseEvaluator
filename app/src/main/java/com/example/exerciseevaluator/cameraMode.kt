@@ -43,6 +43,7 @@ class LivePreviewActivity :
         }
 
         createCameraSource(selectedModel)
+        cameraSource?.setFacing(CameraSource.CAMERA_FACING_FRONT)
     }
 
     @Synchronized
@@ -64,9 +65,9 @@ class LivePreviewActivity :
         Log.d(TAG, "Set facing")
         if (cameraSource != null) {
             if (isChecked) {
-                cameraSource?.setFacing(CameraSource.CAMERA_FACING_FRONT)
-            } else {
                 cameraSource?.setFacing(CameraSource.CAMERA_FACING_BACK)
+            } else {
+                cameraSource?.setFacing(CameraSource.CAMERA_FACING_FRONT)
             }
         }
         preview?.stop()
@@ -83,13 +84,13 @@ class LivePreviewActivity :
                 POSE_DETECTION -> {
                     val poseDetectorOptions = PreferenceUtils.getPoseDetectorOptionsForLivePreview(this)
                     Log.i(TAG, "Using Pose Detector with options $poseDetectorOptions")
-                    val shouldShowInFrameLikelihood = true
+                    val shouldShowInFrameLikelihood = false
 //                        PreferenceUtils.shouldShowPoseDetectionInFrameLikelihoodLivePreview(this)
                     val visualizeZ = true
 //                        PreferenceUtils.shouldPoseDetectionVisualizeZ(this)
                     val rescaleZ = true
 //                        PreferenceUtils.shouldPoseDetectionRescaleZForVisualization(this)
-                    val runClassification = false
+                    val runClassification = true
 //                        PreferenceUtils.shouldPoseDetectionRunClassification(this)
                     cameraSource!!.setMachineLearningFrameProcessor(
                         PoseDetectorProcessor(

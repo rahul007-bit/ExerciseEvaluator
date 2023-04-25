@@ -311,7 +311,7 @@ abstract class VisionProcessorBase<T>(context: Context) : VisionImageProcessor {
 
           // Only log inference info once per second. When frameProcessedInOneSecondInterval is
           // equal to 1, it means this is the first frame processed during the current second.
-          if (frameProcessedInOneSecondInterval == 1) {
+          if (false) {
             Log.d(TAG, "Num of Runs: $numRuns")
             Log.d(
               TAG,

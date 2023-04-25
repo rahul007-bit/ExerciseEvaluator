@@ -74,7 +74,7 @@ class PoseDetectorProcessor(
           if (poseClassifierProcessor == null) {
             poseClassifierProcessor = PoseClassifierProcessor(context, isStreamMode)
           }
-          classificationResult = poseClassifierProcessor!!.getPoseResult(pose)
+          classificationResult = listOf(poseClassifierProcessor!!.classifyPose(pose))
         }
         PoseWithClassification(pose, classificationResult)
       }
@@ -92,7 +92,7 @@ class PoseDetectorProcessor(
           if (poseClassifierProcessor == null) {
             poseClassifierProcessor = PoseClassifierProcessor(context, isStreamMode)
           }
-          classificationResult = poseClassifierProcessor!!.getPoseResult(pose)
+          classificationResult = listOf(poseClassifierProcessor!!.classifyPose(pose))
         }
         PoseWithClassification(pose, classificationResult)
       }

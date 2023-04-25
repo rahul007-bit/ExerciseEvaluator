@@ -225,7 +225,6 @@ internal constructor(
   }
 
   companion object {
-
     private val DOT_RADIUS = 8.0f
     private val IN_FRAME_LIKELIHOOD_TEXT_SIZE = 30.0f
     private val STROKE_WIDTH = 10.0f

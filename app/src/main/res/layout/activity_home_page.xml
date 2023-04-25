@@ -50,7 +50,7 @@
                 android:layout_height="match_parent"
                 android:contentDescription="@string/push_up_image_description"
                 android:scaleType="centerCrop"
-                android:src="@drawable/push_preview" />
+                android:src="@drawable/bridge" />
 
             <TextView
                 android:layout_width="match_parent"

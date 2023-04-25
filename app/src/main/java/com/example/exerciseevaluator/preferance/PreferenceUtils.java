@@ -16,7 +16,7 @@ import com.example.exerciseevaluator.utils.CameraSource;
 import com.example.exerciseevaluator.utils.CameraSource.SizePair;
 import com.google.mlkit.vision.pose.PoseDetectorOptionsBase;
 import com.google.mlkit.vision.pose.accurate.AccuratePoseDetectorOptions;
-import com.google.mlkit.vision.pose.defaults.PoseDetectorOptions;
+import com.google.mlkit.vision.pose.PoseDetectorOptionsBase;
 
 /** Utility class to retrieve shared preferences. */
 public class PreferenceUtils {
@@ -59,10 +59,10 @@ public class PreferenceUtils {
             POSE_DETECTOR_PERFORMANCE_MODE_FAST);
     boolean preferGPU = preferGPUForPoseDetection(context);
     if (performanceMode == POSE_DETECTOR_PERFORMANCE_MODE_FAST) {
-      PoseDetectorOptions.Builder builder =
-          new PoseDetectorOptions.Builder().setDetectorMode(PoseDetectorOptions.STREAM_MODE);
+      AccuratePoseDetectorOptions.Builder builder =
+          new AccuratePoseDetectorOptions.Builder().setDetectorMode(AccuratePoseDetectorOptions.STREAM_MODE);
 //      if (preferGPU) {
-        builder.setPreferredHardwareConfigs(PoseDetectorOptions.CPU_GPU);
+        builder.setPreferredHardwareConfigs(AccuratePoseDetectorOptions.CPU_GPU);
 //      }
       return builder.build();
     } else {

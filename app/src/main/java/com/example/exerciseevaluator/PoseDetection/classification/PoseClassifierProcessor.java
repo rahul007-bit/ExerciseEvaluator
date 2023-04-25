@@ -16,7 +16,10 @@
 
 package com.example.exerciseevaluator.PoseDetection.classification;
 
+import static java.lang.Math.atan2;
+
 import android.content.Context;
+import android.graphics.PointF;
 import android.media.AudioManager;
 import android.media.ToneGenerator;
 import android.os.Looper;
@@ -26,6 +29,7 @@ import androidx.annotation.WorkerThread;
 
 import com.google.common.base.Preconditions;
 import com.google.mlkit.vision.pose.Pose;
+import com.google.mlkit.vision.pose.PoseLandmark;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -42,12 +46,16 @@ public class PoseClassifierProcessor {
   private static final String POSE_SAMPLES_FILE = "pose/fitness_pose_samples.csv";
 
   // Specify classes for which we want rep counting.
-  // These are the labels in the given {@code POSE_SAMPLES_FILE}. You can set your own class labels
+  // These are the labels in the given {@code POSE_SAMPLES_FILE}. You can set your
+  // own class labels
   // for your pose samples.
-  private static final String PUSHUPS_CLASS = "pushups_down";
-  private static final String SQUATS_CLASS = "squats_down";
+  private static final String PUSHUPS_CLASS = "bridge_down";
+  private static final String SQUATS_CLASS = "bridge_up";
+  private boolean STARTED = false;
+  // current state of the exercise
+  private String currentState = "none";
   private static final String[] POSE_CLASSES = {
-    PUSHUPS_CLASS, SQUATS_CLASS
+      PUSHUPS_CLASS, SQUATS_CLASS
   };
 
   private final boolean isStreamMode;
@@ -66,7 +74,7 @@ public class PoseClassifierProcessor {
       repCounters = new ArrayList<>();
       lastRepResult = "";
     }
-    loadPoseSamples(context);
+    // loadPoseSamples(context);
   }
 
   private void loadPoseSamples(Context context) {
@@ -76,7 +84,8 @@ public class PoseClassifierProcessor {
           new InputStreamReader(context.getAssets().open(POSE_SAMPLES_FILE)));
       String csvLine = reader.readLine();
       while (csvLine != null) {
-        // If line is not a valid {@link PoseSample}, we'll get null and skip adding to the list.
+        // If line is not a valid {@link PoseSample}, we'll get null and skip adding to
+        // the list.
         PoseSample poseSample = PoseSample.getPoseSample(csvLine, ",");
         if (poseSample != null) {
           poseSamples.add(poseSample);
@@ -95,10 +104,12 @@ public class PoseClassifierProcessor {
   }
 
   /**
-   * Given a new {@link Pose} input, returns a list of formatted {@link String}s with Pose
+   * Given a new {@link Pose} input, returns a list of formatted {@link String}s
+   * with Pose
    * classification results.
    *
-   * <p>Currently it returns up to 2 strings as following:
+   * <p>
+   * Currently it returns up to 2 strings as following:
    * 0: PoseClass : X reps
    * 1: PoseClass : [0.0-1.0] confidence
    */
@@ -147,6 +158,92 @@ public class PoseClassifierProcessor {
     }
 
     return result;
+  }
+
+  public String classifyPose(Pose poseLandmarks) {
+    // Check if the pose is lying on the ground
+    if (!isLyingOnGround(poseLandmarks)) {
+      if (this.STARTED) {
+        this.STARTED = false;
+        this.currentState = "none";
+      }
+      return "Please lie on the ground";
+    }
+    if (!this.STARTED) {
+      this.currentState = "bridge_down";
+      this.STARTED = true;
+    }
+    // angle of foot, knee, hip
+    double angleOfKnee = getAngle(
+        poseLandmarks.getPoseLandmark(PoseLandmark.LEFT_ANKLE),
+        poseLandmarks.getPoseLandmark(PoseLandmark.LEFT_KNEE),
+        poseLandmarks.getPoseLandmark(PoseLandmark.LEFT_HIP));
+    // angle shoulder, hip, knee
+    double angleOfShoulder = getAngle(
+        poseLandmarks.getPoseLandmark(PoseLandmark.LEFT_SHOULDER),
+        poseLandmarks.getPoseLandmark(PoseLandmark.LEFT_HIP),
+        poseLandmarks.getPoseLandmark(PoseLandmark.LEFT_KNEE));
+    // print the angle of the pose
+    System.out.println("Angle of shoulder: " + angleOfShoulder);
+    System.out.println("Angle of knee: " + angleOfKnee);
+    if ((angleOfShoulder > 140 && angleOfShoulder < 180) && angleOfKnee > 40) {
+      return "Bridge up";
+    }
+    if (angleOfKnee < 80 && (angleOfShoulder > 90 && (angleOfShoulder < 140))) {
+      System.out.println("Bridge down");
+      if (angleOfKnee > 35) {
+        return "Bridge down";
+      } else {
+        System.out.println("issue in down");
+        return "Fold your knee";
+      }
+    }
+
+    System.out.println("Unknown");
+    return "Unknown";
+  }
+
+  static double getAngle(PoseLandmark firstPoint, PoseLandmark midPoint, PoseLandmark lastPoint) {
+    if (firstPoint != null && midPoint != null && lastPoint != null) {
+      double result = Math.toDegrees(
+          atan2(lastPoint.getPosition().y - midPoint.getPosition().y,
+              lastPoint.getPosition().x - midPoint.getPosition().x)
+              - atan2(firstPoint.getPosition().y - midPoint.getPosition().y,
+                  firstPoint.getPosition().x - midPoint.getPosition().x));
+      result = Math.abs(result); // Angle should never be negative
+      if (result > 180) {
+        result = (360.0 - result); // Always get the acute representation of the angle
+      }
+      return result;
+    } else
+      return 0;
+
+  }
+
+  // lying on ground
+  static boolean isLyingOnGround(Pose poseLandmarks) {
+    // check is pose is available
+    if (poseLandmarks == null) {
+      return false;
+    }
+    // get coordinates of the shoulders left and right
+    PoseLandmark leftShoulder = poseLandmarks.getPoseLandmark(PoseLandmark.LEFT_SHOULDER);
+    PoseLandmark rightShoulder = poseLandmarks.getPoseLandmark(PoseLandmark.RIGHT_SHOULDER);
+    // get coordinates of the nose
+    PoseLandmark nose = poseLandmarks.getPoseLandmark(PoseLandmark.NOSE);
+    // get coordinates of the feet left and right
+    PoseLandmark leftFoot = poseLandmarks.getPoseLandmark(PoseLandmark.LEFT_ANKLE);
+    PoseLandmark rightFoot = poseLandmarks.getPoseLandmark(PoseLandmark.RIGHT_ANKLE);
+    // Check if the person is lying down based on the position of their head,
+    // shoulders, and feet
+    if (leftShoulder == null || rightShoulder == null || nose == null || leftFoot == null || rightFoot == null) {
+      return false;
+    }
+    // print the coordinates of the nose
+    return nose.getPosition().y > leftShoulder.getPosition().y &&
+        nose.getPosition().y > rightShoulder.getPosition().y &&
+        nose.getPosition().y > leftFoot.getPosition().y &&
+        nose.getPosition().y > rightFoot.getPosition().y;
   }
 
 }
