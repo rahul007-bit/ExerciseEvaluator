@@ -102,7 +102,6 @@ class PoseDetectorProcessor(
     results: PoseWithClassification,
     graphicOverlay: GraphicOverlay
   ) {
-
     graphicOverlay.add(
       PoseGraphic(
         graphicOverlay,
